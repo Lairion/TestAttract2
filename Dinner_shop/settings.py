@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shop',
     'product',
-    'phonenumber_field',
     'import_export',
 ]
 
