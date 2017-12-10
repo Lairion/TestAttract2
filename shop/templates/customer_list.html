@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="col-2 row" style="margin-left:1px">
-            {% if request.user.is_staff and not customer.confirmed%}
+            {% if customer.products and request.user.is_staff and not customer.confirmed%}
             <div class="col-12 alert {% if customer.name == request.user %}alert-primary{% else %}alert-dark{% endif %}" style="text-align:center;">
                     <a href="/confirmed/?id_row={{customer.name.sale_order.all.0.id}}" >                       
                         <span class="oi oi-check" style="color:green;font-size:20px"></span></a>

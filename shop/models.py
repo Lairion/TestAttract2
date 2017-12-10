@@ -22,7 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(_('active'), default=True)
     is_staff = models.BooleanField(_('staff'), default=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    phone = models.CharField(max_length=100,null=True,blank=True)
+    phone = models.CharField(max_length=100, null=True, blank=True)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -53,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         if self.first_name and self.last_name:
-            return "%s %s." % (self.first_name,self.last_name[0].upper())
+            return "%s %s." % (self.first_name, self.last_name[0].upper())
         return self.email
 
 
@@ -62,26 +62,27 @@ class SaleOrder(models.Model):
     Description: Model Description
     """
     customer = models.ForeignKey(User, related_name="sale_order")
-    who_confirmed = models.ForeignKey(User,related_name="who_confirmed",null=True,blank=True)
+    who_confirmed = models.ForeignKey(
+        User, related_name="who_confirmed", null=True, blank=True)
     date_order_confirm = models.DateField(
-        auto_now=False, 
-        auto_now_add=False, 
-        null=True, 
+        auto_now=False,
+        auto_now_add=False,
+        null=True,
         blank=True)
-    date_reserve = models.DateField(auto_now=False, 
-        auto_now_add=True, 
-        null=True, 
-        blank=True)
+    date_reserve = models.DateField(auto_now=False,
+                                    auto_now_add=True,
+                                    null=True,
+                                    blank=True)
 
     confirmed = models.BooleanField(default=False)
 
-    slug = models.SlugField(max_length=100,null=True,blank=True)
-    
+    slug = models.SlugField(max_length=100, null=True, blank=True)
+
     def save(self, *args, **kwargs):
         self.slug = slugify("sale number")
-        self.slug += "-" + str(self.id) 
+        self.slug += "-" + str(self.id)
         super(SaleOrder, self).save(*args, **kwargs)
-    
+
     def total(self):
         total = self.list_product.all().aggregate(Sum('amount_total'))
         return total["amount_total__sum"]
@@ -93,16 +94,13 @@ class SaleOrder(models.Model):
         self.save()
 
     def get_url(self):
-        return reverse("shop:sale", kwargs = {"slug":self.slug})
-        
+        return reverse("shop:sale", kwargs={"slug": self.slug})
+
     def __str__(self):
         if self.confirmed:
             return str(self.id)
         else:
             return "New sale"
-
-
-
 
     class Meta:
         pass

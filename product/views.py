@@ -1,10 +1,12 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
-from .models import Category,ProductProduct
+from .models import Category, ProductProduct
 from datetime import date
 from shop.models import SaleOrder
 import json
 # Create your views here.
+
+
 class My_product_view:
     """docstring for My_view"""
     @staticmethod
@@ -12,20 +14,20 @@ class My_product_view:
         if not request.user.is_authenticated:
             return redirect("/login/")
         today = date.today()
-        req_so_id = request.GET.get("so_id",None)
+        req_so_id = request.GET.get("so_id", None)
         if req_so_id:
             sale_order = SaleOrder.objects.get(id=req_so_id)
         else:
-            sale_order = SaleOrder.objects.create(date_reserve=today, customer=request.user)
+            sale_order = SaleOrder.objects.create(
+                date_reserve=today, customer=request.user)
             sale_order.save()
         categories = Category.objects.all()
         context = {
-            "title":"Products",
+            "title": "Products",
             "categories": categories,
             "slug": sale_order.slug
         }
-        return render(request,"product/templates/product_list.html",context)
- 
+        return render(request, "product/templates/product_list.html", context)
 
     @staticmethod
     def delete_product(request):
@@ -43,9 +45,7 @@ class My_product_view:
         get_id = request.POST.get("id_product")
         so_id = request.POST.get("sale_order")
         count_product = request.POST.get("count_product")
-        print(count_product)
         product = ProductProduct.objects.get(id=int(get_id))
-        print(product)
         product.count_product = int(count_product)
         product.save()
         return HttpResponse(json.dumps({
@@ -53,4 +53,3 @@ class My_product_view:
             content_type="application/json")
 
         return HttpResponseRedirect("/create_sale_order/")
-        
