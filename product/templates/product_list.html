@@ -1,0 +1,32 @@
+{% extends "templates/base.html" %}
+{% load staticfiles %}
+
+{%block title %} {{title}} {% endblock title%} {% block content %}
+<div class='container'>
+  <form action="/sale_order/{{ slug }}/" method="post">
+    {% csrf_token %}
+  {% for category in categories%}
+    <div class="row"><h3>{{category.name}}</h3></div>
+  	<div class="row">
+  	{% for product in category.product_template.all %}
+		<div class="card col-sm-4" >
+
+		  <img class="card-img-top" src="{{product.image.url}}" alt="Card image cap">
+		  <div class="card-body">
+		  	<h5>{{product.name}}</h5>
+		    <p class="card-text">{{product.description}}</p>
+        <p class="card-text price">{{product.price}} грн.</p>
+        <p>В корзину <input name = "product_template" value="{{product.id}}" class = "in_bucket" type="checkbox"></p>
+		  </div>
+		</div>
+  	{% endfor %}
+  	
+  	</div>
+  {%endfor%}
+  <button type="submit">Confirme</button>
+  </form>
+  <script>
+      
+    </script>
+</div>
+{% endblock content %}

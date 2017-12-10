@@ -1,0 +1,104 @@
+{% extends "templates/base.html" %}
+{% load staticfiles %}
+{% block title %} 
+	{{title}} 
+{% endblock title %}
+{% block content %}
+<div class="container">
+	<div class="row">
+		<div class="col-3"><h2>{{sale_order}}</h2></div>
+		<div class="col-6">
+			<form action="/delete_sale_order/" style ="float:left">
+				<input type="hidden" name="id_row" value={{sale_order.id}}>
+			<button type="submit" class="btn btn-danger" >Удалить заказ</button>
+			</form>
+			<a href="/list_product/?so_id={{sale_order.id}}"><button type="button" class="btn btn-success" style ="float:left">Добавить еды!</button></a>
+			
+			<a href="/list_customer/"><button type="button" class="btn btn-info" style ="float:left">Подтвердить</button></a>
+		</div>
+		<div class="col-3"> Обшая сумма заказа <i id ="total"></i> грн</div>
+	</div>
+	<div id="products" class="row" >
+		{% for product in sale_order.list_product.all%}
+		<div class="card col-4" >
+
+		  <img class="card-img-top product" data-id="{{product.id}}" src="{{product.product_template.image.url}}" alt="Card image cap">
+		  <div class="card-body">
+		  	<h5>{{product.product_template.name}}</h5>
+		    <p class="card-text">{{product.product_template.description}}</p>
+        <p class="card-text price">{{product.product_template.price}} грн. X <input type="text" class="count" name="count_product" data-id={{product.id}} data-price="{{product.product_template.price}}" value="{{product.count_product}}" onchange="change_count(this)"></p>
+        <p class="card-text">Общая сумма <i id="total-{{product.id}}" class="total"></i></p>
+        <p><button data-id="{{product.id}}" type="button" class="btn btn-warning" onclick="delete_product(this)">Убрать</button></p>
+		  </div>
+		</div>
+		{% endfor %}
+	</div>
+	<script>
+		function delete_product(item){
+				var data = {
+					"id_product":$(item).data("id"),
+					"csrfmiddlewaretoken": '{{ csrf_token }}',
+					"sale_order":{{sale_order.id}}
+				}
+				console.dir($)
+				jQuery.ajax({
+				  type: "POST",
+				  url: "/delete_product/",
+				  data: data,
+				  cache:false,
+    			  dataType: "json",
+				  success: function(data){
+				  	window.location.href = data.redirect
+				  	// $("#products").remove(".product[data-id="+data.id+"]")
+
+				  },
+				});
+			}
+			function total_product(){
+				$(".count").each(function(){
+					id = $(this).data("id")
+					console.log(+$(this).data("price"))
+					value =  +$(this).data("price") * (+$(this).val()) 
+					$("#total-"+id).text(value)
+				})
+				total()
+
+			}
+			function change_count(item){
+				total_product()
+				count = $(item)
+				var data = {
+
+					"id_product":$(item).data("id"),
+					"count_product":count.val(),
+					"csrfmiddlewaretoken": '{{ csrf_token }}',
+					"sale_order":{{sale_order.id}}
+				}
+				jQuery.ajax({
+				  type: "POST",
+				  url: "/update_product/",
+				  data: data,
+				  cache:false,
+    			  dataType: "json",
+				  success: function(data){
+				  	if (data.redirect){
+				  		console.log("Ok")
+				  	}
+				  	// $("#products").remove(".product[data-id="+data.id+"]")
+
+				  },
+				});
+			}
+			function total(){
+				sum = 0
+				$(".total").each(function(){
+					n = +$(this).text()
+					sum += n
+					$("#total").text(sum)
+				})
+
+			}
+			total_product()
+	</script>
+</div>
+{% endblock content%}

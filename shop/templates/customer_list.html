@@ -1,0 +1,66 @@
+{% extends "templates/base.html" %} {% block title %}{{ title }}{%endblock title%} {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3" style="text-align:center">Name</div>
+        <div class="col-sm-6" style="text-align:center">Dinners</div>
+        <div class="col-sm-3" style="text-align:center">Confirmed</div>
+    </div>
+    <div class="row">
+        {%for customer in customers%}
+        <div class="row col-10 alert {% if customer.name == request.user %}alert-primary{% else %}alert-dark{% endif %}">
+            <div class="col-sm-3" style="text-align:center">
+                {{customer.name}}
+            </div>
+            <div class="col-sm-9" style="text-align:center">
+                {{customer.product}}
+                {%if customer.products%}
+                    {%for product in customer.products%} 
+                        {% if forloop.last%} 
+                            <i>{{ product}}</i> 
+                        {% else %} 
+                            <i>{{ product}},</i> 
+                            <br>
+                        {%endif%} 
+                    {% endfor %}
+                    <br>
+                    Общая сумма {{customer.total}} 
+                    {% if not customer.confirmed or request.user.is_staff%}
+                        <a href="{{customer.name.sale_order.all.0.get_url}}">
+                            <button type="button" class="btn btn-info">Изменить</button></a>
+                    {% endif %}
+                {% else %}
+                    {% if not customer.confirmed and customer.name == request.user %}
+                        <a href="/list_product/"><button type="button" class="btn btn-primary">Сделать заказа</button></a>
+                    {% else %}
+                    {% endif %}
+                {%endif%}
+
+            </div>
+        </div>
+        <div class="col-2 row" style="margin-left:1px">
+            {% if request.user.is_staff and not customer.confirmed%}
+            <div class="col-12 alert {% if customer.name == request.user %}alert-primary{% else %}alert-dark{% endif %}" style="text-align:center;">
+                    <a href="/confirmed/?id_row={{customer.name.sale_order.all.0.id}}" >                       
+                        <span class="oi oi-check" style="color:green;font-size:20px"></span></a>
+                    
+                    <a href="/delete_sale_order/?id_row={{customer.name.sale_order.all.0.id}}">
+                        <span class="oi oi-x" style="color:red;font-size:20px"></span>
+                    </a>
+                
+                
+            </div>
+            {%else%}
+            <div class="col-12 alert {% if customer.name == request.user %}alert-primary{% else %}alert-dark{% endif %}" style="text-align:center;">
+                {% if customer.confirmed %}
+                    <span class="oi oi-check" style="color:green;font-size:20px"></span>
+                {% else %}
+                    <span class="oi oi-x" style="color:red;font-size:20px"></span>
+                {%endif%}
+                
+            </div>
+            {%endif%}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{%endblock content%}
