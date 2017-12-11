@@ -5,7 +5,7 @@
 <div class='container'>
   <form action="/sale_order/{{ slug }}/" method="post">
     {% csrf_token %}
-  <button type="submit" class="btn btn-success">Confirme</button>
+  <button type="submit" class="btn btn-success">Подтвердить</button>
   {% for category in categories%}
     <div class="row"><h3>{{category.name}}</h3></div>
   	<div class="row">
